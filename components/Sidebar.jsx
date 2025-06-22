@@ -1,13 +1,13 @@
 import { assets } from "@/assets/assets";
 import React, { useState } from "react";
 import Image from "next/image";
-import { useClerk, UserButton } from "@clerk/nextjs";
+import { useClerk, UserButton, useUser } from "@clerk/nextjs";
 import { useAppContext } from "@/context/AppContext";
 import ChatLabel from "./ChatLabel";
 
 const Sidebar = ({ expand, setExpand }) => {
   const { openSignIn } = useClerk();
-  const { user } = useAppContext();
+  const { user } = useUser();
   const[openMenu,setOpenMenu] = useState({id:0, open:false})
 
   return (
@@ -115,7 +115,7 @@ const Sidebar = ({ expand, setExpand }) => {
         </div>
 
         <div
-          onClick={user ? null : openSignIn}
+          onClick={() => !user && openSignIn()}
           className={`flex items-center ${
             expand ? "hover:bg-white/10 rounded-lg" : "justify-center w-full"
           } gap-3 text-white/60 text-sm p-2 mt-2 cursor-pointer`}
