@@ -7,8 +7,23 @@ import ChatLabel from "./ChatLabel";
 
 const Sidebar = ({ expand, setExpand }) => {
   const { openSignIn } = useClerk();
-  const { user } = useUser();
-  const[openMenu,setOpenMenu] = useState({id:0, open:false})
+  const { user, chats, setChats, setSelectedChat, createNewChat, fetchUserChats } = useAppContext();
+  const [openMenu, setOpenMenu] = useState({ id: 0, open: false });
+
+  // Handler for creating and selecting a new chat
+  const handleCreateNewChat = async () => {
+    const newChat = await createNewChat();
+    if (newChat) {
+      await fetchUserChats();
+      // Find the new chat in the updated chats array and select it
+      const found = chats.find(chat => chat._id === newChat._id);
+      if (found) {
+        setSelectedChat(found);
+      } else {
+        setSelectedChat(newChat); // fallback
+      }
+    }
+  };
 
   return (
     <div
@@ -53,7 +68,7 @@ const Sidebar = ({ expand, setExpand }) => {
             </div>
           </div>
         </div>
-        <button
+        <button onClick={handleCreateNewChat}
           className={`mt-8 flex items-center justify-center cursor-pointer ${
             expand
               ? "bg-primary hover:opacity-90 hover:bg-gray-500/30 rounded-2xl gap-2 p-2.5 w-max"
@@ -72,8 +87,16 @@ const Sidebar = ({ expand, setExpand }) => {
           className={`mt-8 text-white/25 text${expand ? "block" : "hidden"}`}
         >
           <p className="my-1">Recents</p>
+          {chats.map((chat, index) => (
+            <ChatLabel
+              key={index} 
+              name={chat.name}
+              id={chat._id}
+              openMenu={openMenu}
+              setOpenMenu={setOpenMenu}
+            />
+          ))}
           {/* chat label */}
-          <ChatLabel openMenu={openMenu} setOpenMenu={setOpenMenu}/>
         </div>
       </div>
 
